@@ -34,7 +34,7 @@ target_texts_inputs = []   #sentence in target language offset by 1
 #load in data 
 
 t = 0
-for line in open("/home/sky/Documents/3.RNN & NLP/sequence to sequence machine translation/fra-eng/fra.txt"):
+for line in open("/fra-eng/fra.txt"):
     #only keep a limited number of samples
     
     t += 1
@@ -132,7 +132,7 @@ print('Loading word vectors...')
 
 word2vec = {}
 
-with open(os.path.join('/home/sky/Documents/3.RNN & NLP/toxic comment nlp rnn/glove.6B.%sd.txt' %EMBEDDING_DIM)) as f:
+with open(os.path.join('/glove.6B.%sd.txt' %EMBEDDING_DIM)) as f:
     # is just a space-seperated text file in the format:
     # word vec[0] vec[1] vec[2]....
     for line in f:
@@ -272,7 +272,7 @@ plt.show()
 
 
 #save model
-model.save("/home/sky/Documents/h5_model/translation.h5")
+model.save("/translation.h5")
 
 
 
