@@ -276,6 +276,131 @@ model.save("/translation.h5")
 
 
 
+######## making predictions ######
+
+# We need to create another model that can take in the RNN state and
+# previous word as input and accept a T=1 sequence.
+
+
+# The encoder will be a stand-alone
+# From this we will get  our decoder hidden state
+
+encoder_model = Model(encoder_inputs_placeholder, encoder_states)
+
+
+decoder_state_input_h = Input(shape=(LATENT_DIM,))
+decoder_state_input_c = Input(shape=(LATENT_DIM,))
+decoder_states_inputs = [decoder_state_input_h,decoder_state_input_c]
+#decoder_states_inputs = [decoder_state_input_h] #gru
+
+
+decoder_inputs_single = Input(shape=(1,))
+decoder_inputs_single_x = decoder_embedding(decoder_inputs_single)
+
+# this time, we want to keep the states too, to be output
+# by our sampling model
+
+decoder_outputs, h, c =  decoder_lstm(decoder_inputs_single_x,
+                                      initial_state=decoder_states_inputs)
+
+# decoder_outputs, state_h =  decoder_lstm(decoder_inputs_single_x,
+#                                       initial_state=decoder_states_inputs)
+#gru
+
+
+decoder_states = [h, c]
+#decoder_states = [h]
+
+decoder_outputs = decoder_dense(decoder_outputs)
+
+
+# The sampling model
+# inputs : y(t-1), h(t-1), c(t-1)
+# outputs : y(t), h(t), c(t)
+
+decoder_model = Model([decoder_inputs_single]+decoder_states_inputs,
+                      [decoder_outputs]+decoder_states)
+
+
+# map indexes back into real words
+# so we can view the results
+
+idx2word_eng = {v:k for k, v in word2idx_inputs.items()}
+idx2word_trans = {v:k for k, v in word2idx_outputs.items()}
+
+
+
+def decode_sequence(input_seq):
+    
+    #Encode the input as state vectors
+    states_value = encoder_model.predict(input_seq)
+    
+    
+    #generate empty target sequence of length 1
+    target_seq = np.zeros((1,1))
+    
+    #populate the first character of target sequence with the start character
+    #Note: tokenizer lower-cases all words
+    target_seq[0,0] = word2idx_outputs['<sos>']
+    
+    #if we get this we break
+    eos = word2idx_outputs['<eos>']
+    
+    #Create the translation
+    output_sentence = []
+    
+    for _ in range(max_len_target):
+        output_tokens, h, c = decoder_model.predict([target_seq]+
+                                                    states_value)
+        #output_tokens, h = decoder_model.predict([target_seq]+
+        #                                               states_value)
+        #gru
+        
+        
+        
+        #Get next word
+        idx = np.argmax(output_tokens[0,0,:])
+        
+        #End sentence of EOS
+        if eos == idx:
+            break
+        
+        word = ''
+        
+        if idx > 0:
+            word = idx2word_trans[idx]
+            output_sentence.append(word)
+            
+            
+        
+        # Update the decoder input
+        # Which is just the word just generated
+        target_seq[0,0] = idx
+        
+        #Update states
+        states_value = [h,c]
+        #states_value = [h] #gru
+        
+    return ' '.join(output_sentence)
+
+
+
+while True:
+    
+    #do some test translations
+     i = np.random.choice(len(input_texts))
+     input_seq = encoder_inputs[i:i+1]
+     translation = decode_sequence(input_seq)
+     print('-')
+     print('Input: ', input_texts[i])
+     print('translation: ', translation)
+     
+     ans = input("Continue? [y/n]")
+     if ans and ans.lower().startswith('n'):
+         break
+
+
+
 
 
 
