@@ -10,8 +10,8 @@ import  matplotlib.pyplot as plt
 
 #we have a dataset for training and distinct dataset for testing
 
-prices_dataset_train = pd.read_csv('/home/sky/Documents/3.RNN & NLP/Stock price prediction/SP500_train.csv')
-prices_dataset_test = pd.read_csv('/home/sky/Documents/3.RNN & NLP/Stock price prediction/SP500_test.csv')
+prices_dataset_train = pd.read_csv('/SP500_train.csv')
+prices_dataset_test = pd.read_csv('/SP500_test.csv')
 
 
 #we are after a given column in the dataser
@@ -119,11 +119,6 @@ plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
 plt.show()
-
-
-
-
-
 
 
 
