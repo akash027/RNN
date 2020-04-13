@@ -17,7 +17,7 @@ encoder_que = []
 decoder_que = []
 decoder_ans = []
 
-for lines in open("/home/sky/Documents/3.RNN & NLP/creating chat bot/chat.text"):
+for lines in open("/chat.text"):
     que, ans = lines.split("\t")
     
     dec_q = '<sos> ' + ans
@@ -82,7 +82,7 @@ print('Loading word vectors...')
 
 word2vec = {}
 
-with open(os.path.join('/home/sky/Documents/3.RNN & NLP/creating chat bot/word_embeddings-1000 x 300.txt')) as f:
+with open(os.path.join('/word_embeddings-1000 x 300.txt')) as f:
     # is just a space-seperated text file in the format:
     # word vec[0] vec[1] vec[2]... 
 
@@ -207,12 +207,12 @@ plt.legend()
 plt.show()
 
 #save model
-#model.save("/home/sky/Documents/h5_model/chat.h5")
+#model.save("/chat.h5")
 
 
 
 # from keras.models import load_model
-# model = load_model("/home/sky/Documents/h5_model/chat.h5")
+# model = load_model("/chat.h5")
 
 
 
@@ -324,8 +324,6 @@ while True:
     ans = input("Continue? [y/n]")
     if ans and ans.lower().startswith('n'):
         break
-
-
 
 
 
